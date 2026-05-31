@@ -1,0 +1,21 @@
+{
+  "name": "job-scam-detector",
+  "version": "1.0.0",
+  "description": "AI-powered job scam detector using agentic AI with Claude API",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "cli": "node index.js"
+  },
+  "keywords": ["job", "scam", "detector", "ai", "agentic", "claude"],
+  "author": "Kartheeswaran",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-sdk/sdk": "^0.24.3",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "readline-sync": "^1.4.10"
+  }
+}
