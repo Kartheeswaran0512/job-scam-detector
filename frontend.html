@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Job Scam Detector</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
+  label { display: block; margin-top: 12px; font-weight: bold; }
+  input { width: 100%; padding: 8px; font-size: 14px; box-sizing: border-box; }
+  button { padding: 10px 20px; font-size: 16px; margin-top: 16px; cursor: pointer; }
+  #result { margin-top: 20px; padding: 15px; border-radius: 8px; white-space: pre-wrap; display: none; }
+  .high { background: #ffe6e6; border: 1px solid #e74c3c; }
+  .medium { background: #fff8e1; border: 1px solid #f39c12; }
+  .low { background: #e6ffed; border: 1px solid #2ecc71; }
+</style>
+</head>
+<body>
+  <h1>🔍 Job Scam Detector</h1>
+
+  <label>Company</label>
+  <input id="company" placeholder="e.g. Infolexus Solutions">
+
+  <label>Job Title</label>
+  <input id="jobTitle" placeholder="e.g. Software Developer">
+
+  <label>Contact Email</label>
+  <input id="email" placeholder="e.g. hr@company.com">
+
+  <label>Offered Salary (numbers only)</label>
+  <input id="salary" placeholder="e.g. 500000">
+
+  <label>Location</label>
+  <input id="location" placeholder="e.g. Madurai, Tamil Nadu">
+
+  <button onclick="analyzeJob()">Analyze</button>
+
+  <div id="result"></div>
+
+<script>
+async function analyzeJob() {
+  const company = document.getElementById('company').value.trim();
+  const jobTitle = document.getElementById('jobTitle').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const salary = document.getElementById('salary').value.trim();
+  const location = document.getElementById('location').value.trim();
+
+  const resultDiv = document.getElementById('result');
+  resultDiv.style.display = 'block';
+  resultDiv.className = '';
+  resultDiv.textContent = 'Analyzing...';
+
+  if (!company || !jobTitle || !email || !salary || !location) {
+    resultDiv.textContent = 'Please fill in all fields.';
+    resultDiv.className = 'high';
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/analyze-job', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ company, jobTitle, email, salary, location })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      resultDiv.textContent = 'Error: ' + data.error;
+      resultDiv.className = 'high';
+      return;
+    }
+
+    resultDiv.textContent = data.verdict;
+
+    const verdictLower = data.verdict.toLowerCase();
+    if (verdictLower.includes('risk level: high')) resultDiv.className = 'high';
+    else if (verdictLower.includes('risk level: medium')) resultDiv.className = 'medium';
+    else resultDiv.className = 'low';
+
+  } catch (err) {
+    resultDiv.textContent = 'Error: ' + err.message;
+    resultDiv.className = 'high';
+  }
+}
+</script>
+</body>
+</html>
