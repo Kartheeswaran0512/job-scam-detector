@@ -1,11 +1,16 @@
-import Anthropic from "@anthropic-sdk/sdk";
+//import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import readlineSync from "readline-sync";
 
 dotenv.config();
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+// const client = new Anthropic({
+//   apiKey: process.env.ANTHROPIC_API_KEY,
+// });
+
+const client = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 async function checkJobScam(company, jobTitle, email, salary, location) {
@@ -51,18 +56,24 @@ RECOMMENDATION:
 
   console.log("\n🤖 Agent analyzing job posting...\n");
 
-  const message = await client.messages.create({
-    model: "claude-3-5-sonnet-20241022",
-    max_tokens: 1024,
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-  });
+  // const message = await client.messages.create({
+  //   model: "claude-3-5-sonnet-20241022",
+  //   max_tokens: 1024,
+  //   messages: [
+  //     {
+  //       role: "user",
+  //       content: prompt,
+  //     },
+  //   ],
+  // });
 
-  return message.content[0].text;
+  // return message.content[0].text;
+     const response = await ai.models.generateContent({
+  model: "gemini-2.5-flash",
+  contents: prompt,
+});
+
+const verdict = response.text;
 }
 
 async function getUserInput() {
