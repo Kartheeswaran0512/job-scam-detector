@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import Anthropic from "@anthropic-sdk/sdk";
+//import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -15,8 +16,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Initialize Anthropic client
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 // Middleware
@@ -81,19 +82,25 @@ RECOMMENDATION:
 [What the job seeker should do]
 `;
 
-    const message = await client.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      max_tokens: 1024,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
+    // const message = await client.messages.create({
+    //   //model: "claude-3-5-sonnet-20241022",
+    //   model:"claude-sonnet-4-5",
+    //   max_tokens: 1000,
+    //   messages: [
+    //     {
+    //       role: "user",
+    //       content: prompt,
+    //     },
+    //   ],
+    // });
 
-    const verdict = message.content[0].text;
+    // const verdict = message.content[0].text;
+     const response = await ai.models.generateContent({
+  model: "gemini-3.5-flash",
+  contents: prompt,
+});
 
+const verdict = response.text;
     res.json({
       success: true,
       verdict: verdict,
@@ -101,6 +108,7 @@ RECOMMENDATION:
     });
 
   } catch (error) {
+    console.log("error");
     console.error("Error:", error.message);
     res.status(500).json({ error: error.message });
   }
@@ -119,3 +127,4 @@ app.listen(PORT, () => {
   console.log(`📍 Open http://localhost:${PORT} in your browser`);
   console.log(`✅ API available at http://localhost:${PORT}/api/analyze-job`);
 });
+
