@@ -1,285 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job Scam Detector - AI-Powered Analysis</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .container {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 700px;
-      width: 100%;
-      padding: 40px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    h1 {
-      color: #333;
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .subtitle {
-      color: #666;
-      font-size: 15px;
-      margin-bottom: 5px;
-    }
-
-    .description {
-      color: #999;
-      font-size: 13px;
-      margin-top: 5px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .required {
-      color: #e74c3c;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 6px;
-      font-size: 14px;
-      font-family: inherit;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-
-    button {
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      margin-top: 10px;
-    }
-
-    button:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .loading {
-      text-align: center;
-      color: #667eea;
-      margin-top: 20px;
-      display: none;
-      font-size: 14px;
-    }
-
-    .loading::after {
-      content: '';
-      animation: dots 1.5s infinite;
-    }
-
-    @keyframes dots {
-      0%, 20% { content: '.'; }
-      40% { content: '..'; }
-      60%, 100% { content: '...'; }
-    }
-
-    .verdict {
-      margin-top: 30px;
-      padding: 20px;
-      background: #f9f9f9;
-      border-radius: 8px;
-      border-left: 5px solid #667eea;
-      display: none;
-      white-space: pre-wrap;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.7;
-      color: #333;
-      max-height: 500px;
-      overflow-y: auto;
-    }
-
-    .verdict.high-risk {
-      border-left-color: #e74c3c;
-      background: #fadbd8;
-    }
-
-    .verdict.medium-risk {
-      border-left-color: #f39c12;
-      background: #fef5e7;
-    }
-
-    .verdict.low-risk {
-      border-left-color: #27ae60;
-      background: #d5f4e6;
-    }
-
-    .error {
-      color: #e74c3c;
-      padding: 12px;
-      background: #fadbd8;
-      border-radius: 6px;
-      margin-top: 20px;
-      display: none;
-      border-left: 4px solid #e74c3c;
-    }
-
-    .input-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-
-    @media (max-width: 600px) {
-      .input-group {
-        grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-
-      .container {
-        padding: 20px;
-      }
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-      color: #999;
-      font-size: 12px;
-    }
-
-    .badge {
-      display: inline-block;
-      background: #667eea;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      margin-left: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Job Scam Detector</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
+  label { display: block; margin-top: 12px; font-weight: bold; }
+  input { width: 100%; padding: 8px; font-size: 14px; box-sizing: border-box; }
+  button { padding: 10px 20px; font-size: 16px; margin-top: 16px; cursor: pointer; }
+  #result { margin-top: 20px; padding: 15px; border-radius: 8px; white-space: pre-wrap; display: none; }
+  .high { background: #ffe6e6; border: 1px solid #e74c3c; }
+  .medium { background: #fff8e1; border: 1px solid #f39c12; }
+  .low { background: #e6ffed; border: 1px solid #2ecc71; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🔍 Job Scam Detector</h1>
-      <p class="subtitle">Powered by Claude AI - Agentic Intelligence</p>
-      <p class="description">Analyze job postings for potential scams using advanced AI reasoning</p>
-    </header>
+  <h1>🔍 Job Scam Detector</h1>
 
-    <form id="jobForm">
-      <div class="form-group">
-        <label for="company">Company Name <span class="required">*</span></label>
-        <input type="text" id="company" name="company" placeholder="e.g., Google, Microsoft, Amazon" required>
-      </div>
+  <label>Company</label>
+  <input id="company" placeholder="e.g. Infolexus Solutions">
 
-      <div class="input-group">
-        <div class="form-group">
-          <label for="jobTitle">Job Title <span class="required">*</span></label>
-          <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g., Senior Software Engineer" required>
-        </div>
+  <label>Job Title</label>
+  <input id="jobTitle" placeholder="e.g. Software Developer">
 
-        <div class="form-group">
-          <label for="salary">Salary ($) <span class="required">*</span></label>
-          <input type="number" id="salary" name="salary" placeholder="e.g., 100000" required min="1">
-        </div>
-      </div>
+  <label>Contact Email</label>
+  <input id="email" placeholder="e.g. hr@company.com">
 
-      <div class="form-group">
-        <label for="email">Contact Email <span class="required">*</span></label>
-        <input type="email" id="email" name="email" placeholder="e.g., hiring@company.com" required>
-      </div>
+  <label>Offered Salary (numbers only)</label>
+  <input id="salary" placeholder="e.g. 500000">
 
-      <div class="form-group">
-        <label for="location">Location <span class="required">*</span></label>
-        <input type="text" id="location" name="location" placeholder="e.g., San Francisco, California" required>
-      </div>
+  <label>Location</label>
+  <input id="location" placeholder="e.g. Madurai, Tamil Nadu">
 
-      <button type="submit">🚀 Analyze Job Posting</button>
-    </form>
+  <button onclick="analyzeJob()">Analyze</button>
 
-    <div class="loading" id="loading">
-      🤖 AI Agent analyzing job posting
-    </div>
+  <div id="result"></div>
 
-    <div class="error" id="error"></div>
+<script>
+async function analyzeJob() {
+  const company = document.getElementById('company').value.trim();
+  const jobTitle = document.getElementById('jobTitle').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const salary = document.getElementById('salary').value.trim();
+  const location = document.getElementById('location').value.trim();
 
-    <div class="verdict" id="verdict"></div>
+  const resultDiv = document.getElementById('result');
+  resultDiv.style.display = 'block';
+  resultDiv.className = '';
+  resultDiv.textContent = 'Analyzing...';
 
-    <div class="footer">
-      <p>💡 Tip: Check emails from official company domains (e.g., @company.com, not @gmail.com)</p>
-      <p>⚠️ This tool analyzes patterns - always verify with official company sources</p>
-    </div>
-  </div>
+  if (!company || !jobTitle || !email || !salary || !location) {
+    resultDiv.textContent = 'Please fill in all fields.';
+    resultDiv.className = 'high';
+    return;
+  }
 
-  <script>
-    const form = document.getElementById('jobForm');
-    const loading = document.getElementById('loading');
-    const error = document.getElementById('error');
-    const verdict = document.getElementById('verdict');
+  try {
+    const res = await fetch('/api/analyze-job', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ company, jobTitle, email, salary, location })
+    });
+    const data = await res.json();
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    if (data.error) {
+      resultDiv.textContent = 'Error: ' + data.error;
+      resultDiv.className = 'high';
+      return;
+    }
 
-      const company = document.getElementById('company').value.trim();
-      const jobTitle = document.getElementById('jobTitle').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const salary = parseInt(document.getElementById('salary').value);
-      const location = document.getElementById('location').value.trim();
+    resultDiv.textContent = data.verdict;
+
+    const verdictLower = data.verdict.toLowerCase();
+    if (verdictLower.includes('risk level: high')) resultDiv.className = 'high';
+    else if (verdictLower.includes('risk level: medium')) resultDiv.className = 'medium';
+    else resultDiv.className = 'low';
+
+  } catch (err) {
+    resultDiv.textContent = 'Error: ' + err.message;
+    resultDiv.className = 'high';
+  }
+}
+</script>
+</body>
+</html>
 
       // Validate inputs
       if (!company || !jobTitle || !email || !salary || !location) {
