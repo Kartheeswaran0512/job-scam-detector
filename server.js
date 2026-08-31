@@ -41,6 +41,8 @@ app.get('/', (req, res) => {
 app.post("/api/analyze-job", async (req, res) => {
   try {
     const { company, jobTitle, email, salary, location } = req.body;
+    const currency = req.body.currency || "INR";
+    const currencySymbol = currency === "USD" ? "$" : "₹";
 
     // Validate input
     if (!company || !jobTitle || !email || !salary || !location) {
@@ -54,14 +56,14 @@ You are a professional job scam detector AI agent. Analyze this job posting and 
 Company: ${company}
 Job Title: ${jobTitle}
 Contact Email: ${email}
-Offered Salary: $${salary}
+Offered Salary: ${currencySymbol}${salary} ${currency}
 Location: ${location}
 
 === YOUR ANALYSIS TASK ===
 Check for these red flags:
 1. Company Legitimacy: Is this a real company? Does it have a credible online presence?
 2. Email Domain: Is the email from the official company domain or a free email service (Gmail, Yahoo)?
-3. Salary Reality: Is the salary realistic for this role in ${location}? Compare to market standards.
+3. Salary Reality: Is the salary realistic for this role in ${location}? Compare to local/regional market standards for that currency — do not assume USD unless the currency is explicitly USD.
 4. Job Offer Quality: Are there any too-good-to-be-true elements?
 5. Scam Patterns: Does this match known job scam patterns?
 
@@ -109,7 +111,7 @@ const verdict = response.text;
     res.json({
       success: true,
       verdict: verdict,
-      input: { company, jobTitle, email, salary, location },
+      input: { company, jobTitle, email, salary, currency, location },
     });
 
   } catch (error) {
