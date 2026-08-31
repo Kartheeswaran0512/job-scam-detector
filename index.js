@@ -13,7 +13,8 @@ const client = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-async function checkJobScam(company, jobTitle, email, salary, location) {
+async function checkJobScam(company, jobTitle, email, salary, location, currency = "INR") {
+  const currencySymbol = currency === "USD" ? "$" : "₹";
   const prompt = `
 You are a professional job scam detector AI agent. Analyze this job posting and determine if it's legitimate or a scam.
 
@@ -21,14 +22,14 @@ You are a professional job scam detector AI agent. Analyze this job posting and 
 Company: ${company}
 Job Title: ${jobTitle}
 Contact Email: ${email}
-Offered Salary: $${salary}
+Offered Salary: ${currencySymbol}${salary} ${currency}
 Location: ${location}
 
 === YOUR ANALYSIS TASK ===
 Check for these red flags:
 1. Company Legitimacy: Is this a real company? Does it have a credible online presence?
 2. Email Domain: Is the email from the official company domain or a free email service (Gmail, Yahoo)?
-3. Salary Reality: Is the salary realistic for this role in ${location}? Compare to market standards.
+3. Salary Reality: Is the salary realistic for this role in ${location}? Compare to local/regional market standards for that currency — do not assume USD unless the currency is explicitly USD.
 4. Job Offer Quality: Are there any too-good-to-be-true elements?
 5. Scam Patterns: Does this match known job scam patterns?
 
@@ -68,12 +69,13 @@ RECOMMENDATION:
   // });
 
   // return message.content[0].text;
-     const response = await ai.models.generateContent({
-  model: "gemini-2.5-flash",
-  contents: prompt,
-});
+  const response = await client.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+  });
 
-const verdict = response.text;
+  const verdict = response.text;
+  return verdict;
 }
 
 async function getUserInput() {
@@ -87,10 +89,12 @@ async function getUserInput() {
   const company = readlineSync.question("? Enter company name: ");
   const jobTitle = readlineSync.question("? Enter job title: ");
   const email = readlineSync.question("? Enter contact email: ");
-  const salary = readlineSync.questionInt("? Enter salary ($): ");
+  const currencyInput = readlineSync.question("? Currency (INR/USD) [INR]: ") || "INR";
+  const currency = currencyInput.trim().toUpperCase() === "USD" ? "USD" : "INR";
+  const salary = readlineSync.questionInt(`? Enter salary (${currency === "USD" ? "$" : "₹"}): `);
   const location = readlineSync.question("? Enter location: ");
 
-  return { company, jobTitle, email, salary, location };
+  return { company, jobTitle, email, salary, currency, location };
 }
 
 async function main() {
@@ -105,7 +109,7 @@ async function main() {
     console.log(`\nCompany: ${jobInput.company}`);
     console.log(`Job Title: ${jobInput.jobTitle}`);
     console.log(`Email: ${jobInput.email}`);
-    console.log(`Salary: $${jobInput.salary}`);
+    console.log(`Salary: ${jobInput.currency === "USD" ? "$" : "₹"}${jobInput.salary} ${jobInput.currency}`);
     console.log(`Location: ${jobInput.location}`);
     console.log();
 
@@ -115,7 +119,8 @@ async function main() {
       jobInput.jobTitle,
       jobInput.email,
       jobInput.salary,
-      jobInput.location
+      jobInput.location,
+      jobInput.currency
     );
 
     // Display verdict
