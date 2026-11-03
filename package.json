@@ -1,9 +1,12 @@
 {
   "name": "job-scam-detector",
   "version": "1.0.0",
-  "description": "AI-powered job scam detector using agentic AI with Claude API",
+  "description": "AI-powered job scam detector using WHOIS, Tavily web search and Google Gemini",
   "main": "server.js",
   "type": "module",
+  "engines": {
+    "node": ">=21"
+  },
   "scripts": {
     "start": "node server.js",
     "cli": "node index.js",
@@ -14,13 +17,11 @@
     "scam",
     "detector",
     "ai",
-    "agentic",
-    "claude"
+    "agentic"
   ],
   "author": "Kartheeswaran",
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.66.0",
     "@google/genai": "^2.12.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

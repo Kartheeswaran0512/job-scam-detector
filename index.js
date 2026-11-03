@@ -43,7 +43,7 @@ function printVerdict(result) {
 async function getUserInput() {
   console.log("\n╔════════════════════════════════════════════════╗");
   console.log("║   🔍 JOB SCAM DETECTOR - Interactive Mode     ║");
-  console.log("║        Powered by Claude AI                    ║");
+  console.log("║        Powered by Google Gemini                ║");
   console.log("╚════════════════════════════════════════════════╝\n");
 
   console.log("📋 Please enter the job posting details:\n");

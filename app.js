@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-//import Anthropic from "@anthropic-ai/sdk";
 import path from "path";
 import { fileURLToPath } from "url";
 import { detectScam, formatVerdict } from "./lib/detectScam.js";
