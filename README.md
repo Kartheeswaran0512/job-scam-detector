@@ -10,7 +10,7 @@ fixed rules in code to reach a verdict.
 
 ## What it does
 
-**Input** (the same five fields in the web page, the CLI, the mobile app and the API):
+**Input** (the same five fields in the web page, the CLI, the mobile app, the API and the MCP server):
 
 | Field | Example |
 |---|---|
@@ -228,6 +228,68 @@ It sends scans to a deployed server whose URL is hardcoded in
 
 ---
 
+## MCP server
+
+[`mcp-server.js`](mcp-server.js) is a [Model Context Protocol](https://modelcontextprotocol.io) server. It
+lets an AI assistant such as Claude Code run the detector as tools. The assistant starts it and talks to it
+over stdin/stdout, so there is no port and nothing to keep running. It reads `.env` from the project folder,
+wherever the assistant starts it from.
+
+| Tool | Inputs | What it runs | Returns (JSON text) |
+|---|---|---|---|
+| `analyze_job_posting` | `company`, `jobTitle`, `email`, `salary` (number), `currency` (`INR` or `USD`, default `INR`), `location` | The full pipeline, the same function as `POST /api/analyze-job` | The same object as `analysis` in the [API](#api) response: `level`, `riskScore`, `verdictNote`, `scores`, `redFlags`, `greenFlags`, `reasoning`, `recommendation`, `model`, `checks` |
+| `check_email_domain` | `email` | Step 2 only: free-provider check and WHOIS/RDAP registration date | `domain`, `isFreeProvider`, `createdAt`, `ageDays`, `error` (why WHOIS failed, or `null`), `redFlags` |
+| `verify_company` | `company`, `location` | Step 1 only: the Tavily company search | `verdict` (`found` or `not found`), `evidence`, `matchedResults` (`title`, `url`, `snippet`), `websites`, `query`, `totalResults` |
+
+`verify_company` does not call Gemini. A result counts as a match when its title or domain matches the full
+company name (step 4's strict match), without checking what the page says, so a page warning about the
+company also matches. `analyze_job_posting` is stricter: Gemini must also judge the result to be about the
+company.
+
+Failures come back as MCP tool errors with a readable message, for example the Gemini quota message described
+in [Known limits](#known-limits), `GEMINI_API_KEY is not set`, or
+`Company web search unavailable: TAVILY_API_KEY is not set`. API keys are removed from these messages and from
+the logs. The server keeps running after an error. Logs go to stderr, because stdout carries the protocol.
+
+The [rate limits](#rate-limiting) apply only to the web API. Every `analyze_job_posting` call uses your own
+Gemini and Tavily quota, and `verify_company` uses Tavily quota.
+
+### Try it with the MCP Inspector
+
+From the project folder:
+
+```bash
+npx @modelcontextprotocol/inspector node mcp-server.js
+```
+
+This starts the MCP Inspector, a browser tool for testing MCP servers, connected to this server. From there
+you can list the three tools and call each one with your own inputs. (`npm run mcp` also starts the server,
+but on its own it just waits for a client on stdin.)
+
+### Add it to Claude Code
+
+```bash
+claude mcp add job-scam-detector -- node D:/job-scam-detector-main/job-scam-detector-main/mcp-server.js
+```
+
+Use the absolute path to `mcp-server.js` in your own copy of the project. By default the server is added for
+the current project only; add `--scope user` before the name to use it in every project. In a Claude Code
+session, `/mcp` shows whether it is connected.
+
+Then ask in plain language, for example:
+
+> Is this job real? Company: Golden Earn Data Services, job title: Data Entry Operator (work from home),
+> email: goldenearn.hr@gmail.com, salary: 1500000 INR, location: Remote.
+
+Claude calls `analyze_job_posting` with those fields and gets the JSON result described above. Its answer is
+based on that result: the risk level (`HIGH`, `MEDIUM` or `LOW`) and risk score, the note when a rule raised
+the level, the red and green flags, the automated checks, Gemini's reasoning and the recommendation. Since the
+scores come from live web search and Gemini, the result for the same posting can change over time. For a
+quick look at only the email or only the company, ask about that and Claude can use `check_email_domain` or
+`verify_company`, which don't call Gemini.
+
+---
+
 ## Rate limiting
 
 Every scan costs Gemini and Tavily calls, so `POST /api/analyze-job` is limited
@@ -329,7 +391,9 @@ Why:
 ├── server.js              # Loads .env and starts the server
 ├── app.js                 # Express app: static files, /api/analyze-job, /api/health
 ├── index.js               # Interactive CLI
+├── mcp-server.js          # MCP server: loads .env, connects the tools to stdio
 ├── lib/
+│   ├── mcpTools.js        # MCP tools: analyze_job_posting, check_email_domain, verify_company
 │   ├── detectScam.js      # Runs the steps above in order
 │   ├── checkDomain.js     # Free-provider check, WHOIS/RDAP registration date
 │   ├── searchCompany.js   # Tavily searches (company, email domain)
