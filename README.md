@@ -5,6 +5,7 @@ the email domain, searches the web for the company, asks Google Gemini to score 
 fixed rules in code to reach a verdict.
 
 **GitHub:** <https://github.com/Kartheeswaran0512/job-scam-detector>
+LIve Demo : https://job-scam-detector-ewdc.onrender.com/
 
 ---
 
